@@ -54,11 +54,15 @@ mails.subscribe(
   () => console.info('completed')
 );
 
+const mailConfig = process.env.NB_BUILD_NUMBER_APP_MAIL_CONFIG
+  && process.env.NB_BUILD_NUMBER_APP_MAIL_CONFIG.split(':');
+if (!mailConfig) throw new Error('Set NB_BUILD_NUMBER_APP_MAIL_CONFIG variable!');
+
 const imap = new Imap({
-  user: 'marketplacenotifications@gmail.com',
-  password: 'h2$c_km^3n0t2d#i',
-  host: 'imap.gmail.com',
-  port: 993,
+  user: mailConfig[0],
+  password: mailConfig[1],
+  host: mailConfig[2],
+  port: mailConfig[3],
   tls: true
 });
 
@@ -81,8 +85,6 @@ imap.once('ready', function() {
 
         stream.once('end', function() {
           if (info.which !== 'TEXT') {
-            // console.log('Parsed header: %s', inspect(Imap.parseHeader(buffer)));
-
             const headers = Imap.parseHeader(buffer);
             mails.onNext({
               date: headers.date[0].trim(),
