@@ -4,7 +4,6 @@
   "description": "???",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node_modules/.bin/supervisor --watch server -- --inspect server/server.js"
   },
   "author": "",
@@ -13,8 +12,7 @@
     "supervisor": "^0.12.0"
   },
   "dependencies": {
-    "imap": "^0.8.19",
-    "mailin": "^3.0.3",
+    "imap": "^0.8.19", ,
     "rx": "^4.1.0",
     "rx-node": "^1.0.2"
   }
