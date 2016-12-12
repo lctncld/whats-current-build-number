@@ -1,5 +1,5 @@
 const PORT = 4000;
-const STATIC_FILE_DIR = __dirname + '/static';
+const STATIC_FILE_DIR = __dirname + '/../static';
 
 const http = require('http');
 const Imap = require('imap');
@@ -31,7 +31,7 @@ server.on('request', function(request, response) {
 });
 
 let mails = new Rx.Subject();
-let versions = {};
+let versions = [];
 
 mails.subscribe(
   mail => {
@@ -43,7 +43,11 @@ mails.subscribe(
       .filter(e => e && !(/ver./).test(e))
       .map(e => e.trim());
     if (app.length !== 2) return;
-    versions[app[0]] = app[1];
+    versions.push({
+      app: app[0],
+      version: app[1],
+      date: new Date(mail.date)
+    });
 
   },
   err => console.error(err),
