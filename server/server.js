@@ -3,15 +3,13 @@ const STATIC_FILE_DIR = __dirname + '/../static';
 
 const http = require('http');
 const Imap = require('imap');
-const inspect = require('util').inspect;
 const Rx = require('rx');
-const url = require('url');
 const fs = require('fs');
 const path = require('path');
 
 const server = http.createServer().listen(PORT);
 server.on('request', function(request, response) {
-  var requestPath = url.parse(request.url).path;
+  let requestPath = request.url;
   if (requestPath === '/version' && request.method === 'GET') {
     response.setHeader('Content-Type', 'application/json');
     response.end(JSON.stringify(versions));
