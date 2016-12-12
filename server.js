@@ -1,14 +1,33 @@
-const PORT = 6000;
+const PORT = 4000;
+const STATIC_FILE_DIR = __dirname + '/static';
 
 const http = require('http');
 const Imap = require('imap');
 const inspect = require('util').inspect;
 const Rx = require('rx');
+const url = require('url');
+const fs = require('fs');
+const path = require('path');
 
 const server = http.createServer().listen(PORT);
 server.on('request', function(request, response) {
-  response.setHeader('Content-Type', 'application/json');
-  response.end(JSON.stringify(versions));
+  var requestPath = url.parse(request.url).path;
+  if (requestPath === '/version' && request.method === 'GET') {
+    response.setHeader('Content-Type', 'application/json');
+    response.end(JSON.stringify(versions));
+  } else {
+    response.setHeader('Content-Type', 'text/html');
+    if (requestPath === '/') requestPath = '/index.html';
+    const fsPath = STATIC_FILE_DIR + path.normalize(requestPath);
+    const fsStream = fs.createReadStream(fsPath);
+    fsStream.on('error', e => {
+      console.warn(e);
+      response.writeHead(404);
+      response.end()
+    });
+    fsStream.pipe(response);
+  }
+
 });
 
 let mails = new Rx.Subject();
