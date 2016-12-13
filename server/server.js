@@ -32,7 +32,7 @@
   let versions = [];
 
   mail.on('message', msg => {
-    console.log('message', msg);
+    console.log('Message', msg);
     const subject = msg.subject;
     const app = subject
       .split(/(.*)(ver.)(.*)/)

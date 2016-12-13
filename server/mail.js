@@ -2,6 +2,7 @@
   'use strict';
 
   const EventEmitter = require('events').EventEmitter;
+  const inspect = require('util').inspect;
   const Imap = require('imap');
 
   const MAIL_CONFIG = process.env.NB_BUILD_NUMBER_APP_MAIL_CONFIG
@@ -9,7 +10,7 @@
   if (!MAIL_CONFIG) throw new Error('Set NB_BUILD_NUMBER_APP_MAIL_CONFIG variable!');
 
   const controller = new EventEmitter();
-  const imap = new Imap({
+  const connection = new Imap({
     user: MAIL_CONFIG[0],
     password: MAIL_CONFIG[1],
     host: MAIL_CONFIG[2],
@@ -17,50 +18,55 @@
     tls: true
   });
 
-  imap.once('ready', function() {
-    imap.openBox('INBOX', true, (err, box) => {
-      if (err) throw err;
+  function openInbox(callback) {
+    connection.openBox('INBOX', true, callback);
+  }
 
-      let msgs = imap.seq.fetch('1:10', {
+  connection.once('ready', function() {
+    openInbox((err, box) => {});
+  });
+
+  connection.on('error', function(err) {
+    console.error(err);
+  });
+
+  connection.on('end', function() {
+    console.log('Connection closed');
+  });
+
+  connection.on('mail', function(newMessageCount) {
+    console.log(`${newMessageCount} new messages`);
+
+    openInbox((err, box) => {
+      if (err) throw err;
+      let messageCount = box.messages.total;
+
+      let threshold = (messageCount === newMessageCount) ? 1 : messageCount - newMessageCount;
+      //TODO need to fetch last X messages at start and newMessageCount messages on subsequent invocations
+
+      let fetch = connection.seq.fetch(`${messageCount}:${threshold}`, {
         bodies: 'HEADER.FIELDS (FROM SUBJECT DATE)',
         struct: true
       });
-
-      msgs.on('message', function(msg) {
-
-        msg.on('body', function(stream, info) {
-          var buffer = '';
-          stream.on('data', function(chunk) {
-            buffer += chunk.toString('utf8');
+      fetch.on('message', (msg) => {
+        msg.on('body', (stream) => {
+          let body = '';
+          stream.on('data', chunk => body += chunk.toString('utf8'));
+          stream.on('end', () => {
+            let header = Imap.parseHeader(body);
+            console.log(`Message header: ${inspect(header)}`);
+            controller.emit('message', {
+              date: header.date[0].trim(),
+              subject: header.subject[0].trim()
+            })
           });
-
-          stream.once('end', function() {
-            if (info.which !== 'TEXT') {
-              const headers = Imap.parseHeader(buffer);
-              controller.emit('message', {
-                date: headers.date[0].trim(),
-                subject: headers.subject[0].trim()
-              });
-            }
-
-          });
-
         });
-
       });
-
     });
+
   });
 
-  imap.once('error', function(err) {
-    console.log(err);
-  });
-
-  imap.once('end', function() {
-    console.log('Connection ended');
-  });
-
-  imap.connect();
+  connection.connect();
 
   module.exports = controller;
 
