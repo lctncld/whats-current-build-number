@@ -35,7 +35,7 @@
   mail.on('message', msg => {
     console.log('Message', msg.subject);
     const subject = msg.subject;
-    const regex = /([\w\d.]+)(\sver.\s)([\w\d.]+)/; //TODO
+    const regex = /(.*)(\sver.\s)(.*)/; //TODO
     const app = subject.replace(regex, '$1').replace('FW: ', '');
     const ver = subject.replace(regex, '$3').replace('FW: ', '');
 
