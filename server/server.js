@@ -7,7 +7,7 @@
   const mail = require('./mail');
   const Versions = require('./versions');
 
-  const PORT = 4000;
+  const PORT = process.env.PORT || 4000;
   const STATIC_FILE_DIR = __dirname + '/../static';
 
   const server = http.createServer().listen(PORT);
