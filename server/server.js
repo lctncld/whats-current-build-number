@@ -5,6 +5,7 @@
   const fs = require('fs');
   const path = require('path');
   const mail = require('./mail');
+  const Versions = require('./versions');
 
   const PORT = 4000;
   const STATIC_FILE_DIR = __dirname + '/../static';
@@ -28,20 +29,6 @@
       fsStream.pipe(response);
     }
   });
-
-  class Versions {
-    constructor() {
-      this.store = [];
-    }
-
-    add(config) {
-      config = config || {};
-      let appVersionStored = this.store.some(e => e.app === config.app);
-      this.store = appVersionStored
-        ? this.store.map(e => e.app !== config.app ? e : config)
-        : [...this.store, config];
-    }
-  }
 
   let versions = new Versions();
 
