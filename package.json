@@ -4,7 +4,8 @@
   "description": "???",
   "main": "server.js",
   "scripts": {
-    "dev": "node_modules/.bin/supervisor --watch server -- --inspect server/server.js"
+    "dev": "node_modules/.bin/supervisor --watch server -- --inspect server/server.js",
+    "up": "node server/server.js"
   },
   "author": "",
   "license": "MIT",
