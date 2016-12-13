@@ -6,12 +6,16 @@
     :host {
       display: block;
     }
+
+    .item {
+      margin: 5px;
+    }
   </style>
   
   <template>
     <iron-ajax auto url="/version" handle-as="json" on-response="onVersionResponse"></iron-ajax>
     <template is="dom-repeat" items="{{apps}}">
-      <paper-card heading="{{item.app}}">
+      <paper-card class="item" heading="{{item.app}}">
         <div class="card-content">{{item.version}}</div>
         <div class="card-actions">
           <span>{{formatDate(item.date)}}</span>
