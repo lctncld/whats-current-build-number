@@ -54,7 +54,7 @@
           stream.on('data', chunk => body += chunk.toString('utf8'));
           stream.on('end', () => {
             let header = Imap.parseHeader(body);
-            console.log(`Message header: ${inspect(header)}`);
+            console.log(`[connection.on:mail][fetch.on:message][message.on:body] ${inspect(header)}`);
             controller.emit('message', {
               date: header.date[0].trim(),
               subject: header.subject[0].trim()

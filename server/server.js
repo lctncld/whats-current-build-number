@@ -14,7 +14,7 @@
     let requestPath = request.url;
     if (requestPath === '/version' && request.method === 'GET') {
       response.setHeader('Content-Type', 'application/json');
-      response.end(JSON.stringify(versions));
+      response.end(JSON.stringify(versions.store));
     } else {
       response.setHeader('Content-Type', 'text/html');
       if (requestPath === '/') requestPath = '/index.html';
@@ -29,19 +29,37 @@
     }
   });
 
-  let versions = [];
+  class Versions {
+    constructor() {
+      this.store = [];
+    }
+
+    add(config) {
+      config = config || {};
+      let appVersionStored = this.store.some(e => e.app === config.app);
+      this.store = appVersionStored
+        ? this.store.map(e => e.app !== config.app ? e : config)
+        : [...this.store, config];
+    }
+  }
+
+  let versions = new Versions();
 
   mail.on('message', msg => {
-    console.log('Message', msg);
+    console.log('Message', msg.subject);
     const subject = msg.subject;
-    const app = subject
-      .split(/(.*)(ver.)(.*)/)
-      .filter(e => e && !(/ver./).test(e))
-      .map(e => e.trim());
-    if (app.length !== 2) return;
-    versions.push({
-      app: app[0],
-      version: app[1],
+    const regex = /([\w\d.]+)(\sver.\s)([\w\d.]+)/; //TODO
+    const app = subject.replace(regex, '$1').replace('FW: ', '');
+    const ver = subject.replace(regex, '$3').replace('FW: ', '');
+
+    if (!app || !ver) {
+      console.info(`${app}:${ver} is not a valid application info`);
+      return;
+    }
+
+    versions.add({
+      app: app,
+      version: ver,
       date: new Date(msg.date)
     });
 
