@@ -12,8 +12,6 @@
     "supervisor": "^0.12.0"
   },
   "dependencies": {
-    "imap": "^0.8.19",
-    "rx": "^4.1.0",
-    "rx-node": "^1.0.2"
+    "imap": "^0.8.19"
   }
 }
