@@ -10,7 +10,7 @@
   </style>
   
   <template>
-    <paper-card id="container" class="item" heading="{{app.app}}" data-clipboard-text$="Fixed in {{app.version}}.">
+    <paper-card id="container" class="item" heading="{{app.app}}" data-clipboard-text$="Fixed in {{nextVersion}}.">
       <paper-ripple></paper-ripple>
       <div class="card-content">{{app.version}}</div>
       <div class="card-actions">
@@ -29,11 +29,17 @@
         type: Object,
         value: function() {
           return {};
-        }
+        },
+        nextVersion: Number
       },
     },
     attached: function() {
       new Clipboard(this.$.container);
+
+      var parts = this.app.version.split('.');
+      var toIncrement = Number(parts.pop()) + 1;
+      parts.push(toIncrement);
+      this.nextVersion = parts.join('.');
     },
     formatDate: function(date) {
       return moment(date).fromNow();
