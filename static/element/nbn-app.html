@@ -1,10 +1,15 @@
 <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html"/>
+<link rel="import" href="/bower_components/paper-toast/paper-toast.html"/>
 <link rel="import" href="/element/nbn-app-card.html"/>
 
 <dom-module id="nbn-app">
   <style>
     :host {
       display: block;
+    }
+    .close-toast-button {
+      color: #b3d4fc;
+      text-transform: none;
     }
   </style>
   
@@ -13,6 +18,12 @@
     <template is="dom-repeat" items="{{apps}}">
       <nbn-app-card app="{{item}}"></nbn-app-card>
     </template>
+  
+    <paper-toast id="toast1" opened duration="0"
+                 text="Click on a card to copy &#34;Fixed in next build&#34; text to clipboard!">
+      <paper-button onclick="toast1.toggle()" class="close-toast-button">Close</paper-button>
+    </paper-toast>
+    
   </template>
 
 </dom-module>
