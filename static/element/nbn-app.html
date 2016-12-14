@@ -25,7 +25,9 @@
   </style>
   
   <template>
-    <iron-ajax auto url="/version" handle-as="json" on-response="onVersionResponse"></iron-ajax>
+    <iron-ajax id="versionRequest" auto url="/version" on-response="onVersionResponse"
+               handle-as="json" debounce-duration="300">
+    </iron-ajax>
     <app-localstorage-document key="versionPrefix" data="{{versionPrefix}}"></app-localstorage-document>
     <app-localstorage-document key="versionPrefixHistory" data="{{prefixHistory}}"></app-localstorage-document>
   
@@ -128,6 +130,18 @@
       if (!this.prefixHistory.length) {
         this.unshift('prefixHistory', this.defaultVersionPrefix);
       }
+
+      this._listenToUpdates();
+    },
+    _listenToUpdates: function() {
+      var ws = new WebSocket("ws://localhost:8080/");
+      ws.onmessage = event => {
+        console.log('message', event);
+        if (event.data === 'update') {
+          this.$.versionRequest.generateRequest();
+        }
+      };
+      window.onbeforeunload = () => ws.close();
     },
     onVersionResponse: function(data) {
       this.apps = data.detail.response;

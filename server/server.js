@@ -4,6 +4,7 @@
   const http = require('http');
   const fs = require('fs');
   const path = require('path');
+  const WebSocketServer = require('ws').Server;
   const mail = require('./mail');
   const Versions = require('./versions');
 
@@ -29,6 +30,16 @@
       fsStream.pipe(response);
     }
   });
+
+  let wss = new WebSocketServer({ port: 8080 });
+  wss.on('connection', ws => {
+    setInterval(_ => ws.send('ping', handleWsSendError), 60 * 1000);
+    mail.on('message', msg => ws.send('update', handleWsSendError));
+  });
+
+  function handleWsSendError(err) {
+    console.warn('ws send error', err);
+  }
 
   let versions = new Versions();
 
