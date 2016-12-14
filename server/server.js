@@ -33,23 +33,8 @@
   let versions = new Versions();
 
   mail.on('message', msg => {
-    console.log('Message', msg.subject);
-    const subject = msg.subject;
-    const regex = /(.*)(\sver.\s)(.*)/; //TODO
-    const app = subject.replace(regex, '$1').replace('FW: ', '');
-    const ver = subject.replace(regex, '$3').replace('FW: ', '');
-
-    if (!app || !ver) {
-      console.info(`${app}:${ver} is not a valid application info`);
-      return;
-    }
-
-    versions.add({
-      app: app,
-      version: ver,
-      date: new Date(msg.date)
-    });
-
+    console.log('Message', msg);
+    versions.add(msg);
   });
 
 })();

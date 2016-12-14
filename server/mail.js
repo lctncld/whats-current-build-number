@@ -53,12 +53,8 @@
           let body = '';
           stream.on('data', chunk => body += chunk.toString('utf8'));
           stream.on('end', () => {
-            let header = Imap.parseHeader(body);
-            console.log(`[connection.on:mail][fetch.on:message][message.on:body] ${inspect(header)}`);
-            controller.emit('message', {
-              date: header.date[0].trim(),
-              subject: header.subject[0].trim()
-            })
+            let entry = mailHeaderToAppEntry(body);
+            controller.emit('message', entry);
           });
         });
       });
@@ -67,6 +63,27 @@
   });
 
   connection.connect();
+
+  function mailHeaderToAppEntry(input) {
+    let header = Imap.parseHeader(input);
+    console.log(`[connection.on:mail][fetch.on:message][message.on:body] ${inspect(header)}`);
+
+    const subject = header.subject[0].trim();
+    const regex = /(.*)(\sver.\s)(.*)/; //TODO
+    const app = subject.replace(regex, '$1').replace('FW: ', '');
+    const ver = subject.replace(regex, '$3').replace('FW: ', '');
+
+    if (!app || !ver) {
+      console.info(`${app}:${ver} is not a valid application info`);
+      return;
+    }
+
+    return {
+      app: app,
+      version: ver,
+      date: new Date(header.date[0])
+    };
+  }
 
   module.exports = controller;
 
