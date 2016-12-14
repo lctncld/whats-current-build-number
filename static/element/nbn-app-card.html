@@ -1,0 +1,42 @@
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/bower_components/paper-ripple/paper-ripple.html">
+
+<dom-module id="nbn-app-card">
+  <style>
+    .item {
+      margin: 5px;
+    }
+  </style>
+  
+  <template>
+    <paper-card id="container" class="item" heading="{{app.app}}" data-clipboard-text$="{{app.version}}">
+      <paper-ripple></paper-ripple>
+      <div class="card-content">{{app.version}}</div>
+      <div class="card-actions">
+        <span>{{formatDate(app.date)}}</span>
+      </div>
+    </paper-card>
+  </template>
+
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'nbn-app-card',
+    properties: {
+      app: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      },
+    },
+    attached: function() {
+      new Clipboard(this.$.container);
+    },
+    formatDate: function(date) {
+      return moment(date).fromNow();
+    }
+  });
+</script>

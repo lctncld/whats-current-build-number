@@ -1,0 +1,36 @@
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html"/>
+<link rel="import" href="/element/nbn-app-card.html"/>
+
+<dom-module id="nbn-app">
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  
+  <template>
+    <iron-ajax auto url="/version" handle-as="json" on-response="onVersionResponse"></iron-ajax>
+    <template is="dom-repeat" items="{{apps}}">
+      <nbn-app-card app="{{item}}"></nbn-app-card>
+    </template>
+  </template>
+
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'nbn-app',
+    properties: {
+      apps: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      },
+    },
+    onVersionResponse: function(data) {
+      this.apps = data.detail.response;
+      console.log(this.apps);
+    }
+  });
+</script>
