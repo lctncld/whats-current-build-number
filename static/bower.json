@@ -6,6 +6,7 @@
     "clipboard": "^1.5.16",
     "app-layout": "PolymerElements/app-layout#^0.10.6",
     "paper-elements": "PolymerElements/paper-elements#^1.0.7",
-    "iron-elements": "PolymerElements/iron-elements#^1.0.10"
+    "iron-elements": "PolymerElements/iron-elements#^1.0.10",
+    "app-storage": "PolymerElements/app-storage#^0.9.8"
   }
 }
