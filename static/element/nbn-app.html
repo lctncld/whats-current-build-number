@@ -1,29 +1,62 @@
+<link rel="import" href="/bower_components/app-layout/app-layout.html"/>
 <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html"/>
 <link rel="import" href="/bower_components/paper-toast/paper-toast.html"/>
+<link rel="import" href="/bower_components/paper-input/paper-input.html"/>
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/iron-icon/iron-icon.html"/>
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html"/>
+<link rel="import" href="/bower_components/iron-a11y-keys/iron-a11y-keys.html">
+
 <link rel="import" href="/element/nbn-app-card.html"/>
 
 <dom-module id="nbn-app">
   <style>
-    :host {
-      display: block;
-    }
     .close-toast-button {
       color: #b3d4fc;
       text-transform: none;
+    }
+    
+    .content {
+      padding: 10px;
     }
   </style>
   
   <template>
     <iron-ajax auto url="/version" handle-as="json" on-response="onVersionResponse"></iron-ajax>
-    <template is="dom-repeat" items="{{apps}}">
-      <nbn-app-card app="{{item}}"></nbn-app-card>
-    </template>
-  
-    <paper-toast id="toast1" opened duration="0"
-                 text="Click on a card to copy &#34;Fixed in next build&#34; text to clipboard!">
-      <paper-button onclick="toast1.toggle()" class="close-toast-button">Close</paper-button>
-    </paper-toast>
     
+    <app-drawer-layout force-narrow>
+      <app-drawer id="drawer">
+        <div class="content">
+          <iron-a11y-keys id="a11y" target="[[target]]"
+                          keys="enter" on-keys-pressed="saveTemplate"></iron-a11y-keys>
+          <paper-input id="versionPrefixInput" label="Prefix" placeholder="Just the version"
+                       value="{{versionPrefix}}">
+            <div suffix>[[versionPrefixExample]]</div>
+            <paper-icon-button suffix icon="done" alt="Done" title="Done"
+                               on-tap="saveTemplate"></paper-icon-button>
+          </paper-input>
+        </div>
+      </app-drawer>
+      <app-header-layout>
+        <app-header>
+          <app-toolbar>
+            <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+            <div main-title>What build is it?</div>
+          </app-toolbar>
+        </app-header>
+        <div>
+          <template is="dom-repeat" items="{{apps}}">
+            <nbn-app-card app="{{item}}" version-prefix="[[versionPrefix]]"></nbn-app-card>
+          </template>
+        </div>
+      </app-header-layout>
+    
+    </app-drawer-layout>
+    <paper-toast id="toastHowTo" opened duration="0"
+                 text="Click on a card to copy &#34;Fixed in next build&#34; text to clipboard!">
+      <paper-button onclick="toastHowTo.toggle()" class="close-toast-button">Close</paper-button>
+    </paper-toast>
+  
   </template>
 
 </dom-module>
@@ -38,10 +71,27 @@
           return [];
         }
       },
+      versionPrefix: {
+        type: String,
+        value: 'Fixed in'
+      },
+      versionPrefixInput: {
+        type: Object,
+        value: function() {
+          return this.$.versionPrefixInput;
+        }
+      },
+      versionPrefixExample: {
+        type: String,
+        value: 'fo1.2.345'
+      }
     },
     onVersionResponse: function(data) {
       this.apps = data.detail.response;
       console.log(this.apps);
+    },
+    saveTemplate: function() {
+      this.$.drawer.close();
     }
   });
 </script>

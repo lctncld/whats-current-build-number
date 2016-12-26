@@ -2,9 +2,10 @@
   "name": "whats-current-build-number-ui",
   "main": "index.html",
   "dependencies": {
-    "paper-elements": "PolymerElements/paper-elements#^1.0.7",
-    "iron-elements": "PolymerElements/iron-elements#^1.0.10",
     "moment": "^2.17.1",
-    "clipboard": "^1.5.16"
+    "clipboard": "^1.5.16",
+    "app-layout": "PolymerElements/app-layout#^0.10.6",
+    "paper-elements": "PolymerElements/paper-elements#^1.0.7",
+    "iron-elements": "PolymerElements/iron-elements#^1.0.10"
   }
 }

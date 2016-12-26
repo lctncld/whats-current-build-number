@@ -10,7 +10,7 @@
   </style>
   
   <template>
-    <paper-card id="container" class="item" heading="{{app.app}}" data-clipboard-text$="Fixed in {{nextVersion}}.">
+    <paper-card id="container" class="item" heading="{{app.app}}" data-clipboard-text$="{{versionPrefix}} {{nextVersion}}">
       <paper-ripple></paper-ripple>
       <div class="card-content">{{app.version}}</div>
       <div class="card-actions">
@@ -30,7 +30,14 @@
         value: function() {
           return {};
         },
-        nextVersion: Number
+        nextVersion: {
+          type: String,
+          value: ''
+        },
+        versionPrefix: {
+          type: String,
+          value: ''
+        }
       },
     },
     attached: function() {
