@@ -31,21 +31,23 @@
         value: function() {
           return {};
         },
-        nextVersion: {
-          type: String
-        },
-        versionPrefix: {
-          type: String
-        },
-        nextVersionFormatted: {
-          type: String,
-          readOnly: true,
-          notify: true
-        }
+        observer: '_onAppChanged'
       },
+      nextVersion: {
+        type: String
+      },
+      versionPrefix: {
+        type: String
+      },
+      nextVersionFormatted: {
+        type: String,
+        notify: true
+      }
     },
     attached: function() {
       new Clipboard(this.$.container);
+    },
+    _onAppChanged: function() {
       var parts = this.app.version.split('.');
       var toIncrement = Number(parts.pop()) + 1;
       parts.push(toIncrement);
