@@ -5,7 +5,9 @@
 <link rel="import" href="/bower_components/paper-input/paper-input.html"/>
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="/bower_components/iron-icon/iron-icon.html"/>
+<link rel="import" href="/bower_components/paper-button/paper-button.html"/>
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html"/>
+<link rel="import" href="/bower_components/paper-item/paper-item.html"/>
 <link rel="import" href="/bower_components/iron-a11y-keys/iron-a11y-keys.html">
 
 <link rel="import" href="/element/nbn-app-card.html"/>
@@ -18,26 +20,44 @@
     }
     
     .content {
-      padding: 10px;
+      padding: 16px;
     }
   </style>
   
   <template>
     <iron-ajax auto url="/version" handle-as="json" on-response="onVersionResponse"></iron-ajax>
     <app-localstorage-document key="versionPrefix" data="{{versionPrefix}}"></app-localstorage-document>
-    
+    <app-localstorage-document key="versionPrefixHistory" data="{{prefixHistory}}"></app-localstorage-document>
+  
     <app-drawer-layout force-narrow>
       <app-drawer id="drawer">
         <div class="content">
+  
           <iron-a11y-keys id="a11y" target="[[target]]"
-                          keys="enter" on-keys-pressed="saveTemplate"></iron-a11y-keys>
+                          keys="enter" on-keys-pressed="saveTemplateAndCloseDrawer"></iron-a11y-keys>
           <paper-input id="versionPrefixInput" label="Prefix" placeholder="Just the version"
                        value="{{versionPrefix}}">
             <div suffix>[[versionPrefixExample]]</div>
             <paper-icon-button suffix icon="done" alt="Done" title="Done"
-                               on-tap="saveTemplate"></paper-icon-button>
+                               on-tap="saveTemplateAndCloseDrawer"></paper-icon-button>
           </paper-input>
         </div>
+  
+        <div role="listbox">
+          <template is="dom-repeat" items="{{prefixHistory}}">
+            <paper-item on-tap="setPrefixFromHistory">
+              <paper-icon-button icon="delete" on-tap="removeFromHistory"></paper-icon-button>
+              <paper-item-body>
+                <div>{{item}}</div>
+              </paper-item-body>
+            </paper-item>
+          </template>
+        </div>
+        
+        <div class="content">
+          <paper-button on-tap="setDefaultVersionPrefix">Set default</paper-button>
+        </div>
+
       </app-drawer>
       <app-header-layout>
         <app-header>
@@ -74,6 +94,20 @@
         type: String,
         value: 'Fixed in'
       },
+      defaultVersionPrefix: {
+        type: String,
+        value: 'Fixed in'
+      },
+      prefixHistory: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      },
+      historySize: {
+        type: Number,
+        value: 10
+      },
       versionPrefixInput: {
         type: Object,
         value: function() {
@@ -91,13 +125,45 @@
     },
     attached: function() {
       this.listen(this.$.items, 'nextVersionFormatted', '_onNextVersionFormatted');
+      if (!this.prefixHistory.length) {
+        this.unshift('prefixHistory', this.defaultVersionPrefix);
+      }
     },
     onVersionResponse: function(data) {
       this.apps = data.detail.response;
-      console.log(this.apps);
     },
     saveTemplate: function() {
+      this.versionPrefix = this.versionPrefix.trim();
+      if (!!this.versionPrefix && !~this.prefixHistory.indexOf(this.versionPrefix)) {
+
+        if (this.prefixHistory.length > this.historySize) {
+          this.pop('prefixHistory');
+        }
+
+        this.unshift('prefixHistory', this.versionPrefix);
+      }
+    },
+    saveTemplateAndCloseDrawer: function() {
+      this.saveTemplate();
       this.$.drawer.close();
+    },
+    removeFromHistory: function(event) {
+      var prefix = event.model.item;
+      var index = this.prefixHistory.indexOf(prefix);
+      this.splice('prefixHistory', index, 1);
+
+      if (this.versionPrefix === prefix) {
+        this.versionPrefix = '';
+      }
+    },
+    setPrefixFromHistory: function(event) {
+      if (event.target.id !== 'icon') {
+        this.versionPrefix = event.model.item;
+      }
+    },
+    setDefaultVersionPrefix: function() {
+      this.versionPrefix = this.defaultVersionPrefix;
+      this.saveTemplate();
     }
   });
 </script>
