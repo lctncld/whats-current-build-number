@@ -31,7 +31,7 @@
     }
   });
 
-  let wss = new WebSocketServer({ port: 8080 });
+  let wss = new WebSocketServer({server: server});
   wss.on('connection', ws => {
     setInterval(_ => ws.send('ping', handleWsSendError), 60 * 1000);
     mail.on('message', msg => ws.send('update', handleWsSendError));
