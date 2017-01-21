@@ -1,16 +1,16 @@
-<link rel="import" href="/bower_components/app-layout/app-layout.html"/>
-<link rel="import" href="/bower_components/app-storage/app-localstorage/app-localstorage-document.html"/>
-<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html"/>
-<link rel="import" href="/bower_components/paper-toast/paper-toast.html"/>
-<link rel="import" href="/bower_components/paper-input/paper-input.html"/>
+<link rel="import" href="/bower_components/app-layout/app-layout.html" />
+<link rel="import" href="/bower_components/app-storage/app-localstorage/app-localstorage-document.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-toast/paper-toast.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="/bower_components/iron-icon/iron-icon.html"/>
-<link rel="import" href="/bower_components/paper-button/paper-button.html"/>
-<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html"/>
-<link rel="import" href="/bower_components/paper-item/paper-item.html"/>
+<link rel="import" href="/bower_components/iron-icon/iron-icon.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html" />
+<link rel="import" href="/bower_components/paper-item/paper-item.html" />
 <link rel="import" href="/bower_components/iron-a11y-keys/iron-a11y-keys.html">
 
-<link rel="import" href="/element/nbn-app-card.html"/>
+<link rel="import" href="/element/nbn-app-card.html" />
 
 <dom-module id="nbn-app">
   <style>
@@ -18,67 +18,63 @@
       color: #b3d4fc;
       text-transform: none;
     }
-    
+
     .content {
       padding: 16px;
     }
   </style>
-  
-  <template>
-    <iron-ajax id="versionRequest" auto url="/version" on-response="onVersionResponse"
-               handle-as="json" debounce-duration="300">
-    </iron-ajax>
-    <app-localstorage-document key="versionPrefix" data="{{versionPrefix}}"></app-localstorage-document>
-    <app-localstorage-document key="versionPrefixHistory" data="{{prefixHistory}}"></app-localstorage-document>
-  
-    <app-drawer-layout force-narrow>
-      <app-drawer id="drawer">
-        <div class="content">
-  
-          <iron-a11y-keys id="a11y" target="[[target]]"
-                          keys="enter" on-keys-pressed="saveTemplateAndCloseDrawer"></iron-a11y-keys>
-          <paper-input id="versionPrefixInput" label="Prefix" placeholder="Just the version"
-                       value="{{versionPrefix}}">
-            <div suffix>[[versionPrefixExample]]</div>
-            <paper-icon-button suffix icon="done" alt="Done" title="Done"
-                               on-tap="saveTemplateAndCloseDrawer"></paper-icon-button>
-          </paper-input>
-        </div>
-  
-        <div role="listbox">
-          <template is="dom-repeat" items="{{prefixHistory}}">
-            <paper-item on-tap="setPrefixFromHistory">
-              <paper-icon-button icon="delete" on-tap="removeFromHistory"></paper-icon-button>
-              <paper-item-body>
-                <div>{{item}}</div>
-              </paper-item-body>
-            </paper-item>
-          </template>
-        </div>
-        
-        <div class="content">
-          <paper-button on-tap="setDefaultVersionPrefix">Set default</paper-button>
-        </div>
 
-      </app-drawer>
-      <app-header-layout>
-        <app-header>
-          <app-toolbar>
-            <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
-            <div main-title>What build is it?</div>
-          </app-toolbar>
-        </app-header>
-        <div id="items">
-          <template is="dom-repeat" items="{{apps}}">
-            <nbn-app-card app="{{item}}" version-prefix="[[versionPrefix]]"></nbn-app-card>
-          </template>
-        </div>
-      </app-header-layout>
-    
-    </app-drawer-layout>
-    <paper-toast id="toastSuccess"></paper-toast>
-  
-  </template>
+<template>
+  <iron-ajax id="versionRequest" auto url="/version" on-response="onVersionResponse" handle-as="json" debounce-duration="300">
+  </iron-ajax>
+  <app-localstorage-document key="versionPrefix" data="{{versionPrefix}}"></app-localstorage-document>
+  <app-localstorage-document key="versionPrefixHistory" data="{{prefixHistory}}"></app-localstorage-document>
+
+  <app-drawer-layout force-narrow>
+    <app-drawer id="drawer">
+      <div class="content">
+
+        <iron-a11y-keys id="a11y" target="[[target]]" keys="enter" on-keys-pressed="saveTemplateAndCloseDrawer"></iron-a11y-keys>
+        <paper-input id="versionPrefixInput" label="Prefix" placeholder="Just the version" value="{{versionPrefix}}">
+          <div suffix>[[versionPrefixExample]]</div>
+          <paper-icon-button suffix icon="done" alt="Done" title="Done" on-tap="saveTemplateAndCloseDrawer"></paper-icon-button>
+        </paper-input>
+      </div>
+
+      <div role="listbox">
+        <template is="dom-repeat" items="{{prefixHistory}}">
+          <paper-item on-tap="setPrefixFromHistory">
+            <paper-icon-button icon="delete" on-tap="removeFromHistory"></paper-icon-button>
+            <paper-item-body>
+              <div>{{item}}</div>
+            </paper-item-body>
+          </paper-item>
+        </template>
+      </div>
+
+      <div class="content">
+        <paper-button on-tap="setDefaultVersionPrefix">Set default</paper-button>
+      </div>
+
+    </app-drawer>
+    <app-header-layout>
+      <app-header>
+        <app-toolbar>
+          <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+          <div main-title>What build is it?</div>
+        </app-toolbar>
+      </app-header>
+      <div id="items">
+        <template is="dom-repeat" items="{{apps}}">
+          <nbn-app-card app="{{item}}" version-prefix="[[versionPrefix]]"></nbn-app-card>
+        </template>
+      </div>
+    </app-header-layout>
+
+  </app-drawer-layout>
+  <paper-toast id="toastSuccess"></paper-toast>
+
+</template>
 
 </dom-module>
 
@@ -118,7 +114,7 @@
       },
       versionPrefixExample: {
         type: String,
-        value: 'fo1.2.345'
+        value: 'fo1.0.0'
       }
     },
     _onNextVersionFormatted: function(event) {
@@ -145,6 +141,10 @@
     },
     onVersionResponse: function(data) {
       this.apps = data.detail.response;
+      this.versionPrefixExample = this.apps[this._getRandomInt(0, this.apps.length - 1)].version;
+    },
+    _getRandomInt: function(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     },
     saveTemplate: function() {
       this.versionPrefix = this.versionPrefix.trim();
