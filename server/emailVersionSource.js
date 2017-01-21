@@ -5,6 +5,8 @@
   const inspect = require('util').inspect;
   const Imap = require('imap');
 
+  const log = require('bunyan').createLogger({ name: 'EmailVersionSource' });
+
   const MAIL_CONFIG = process.env.NB_BUILD_NUMBER_APP_MAIL_CONFIG
     && process.env.NB_BUILD_NUMBER_APP_MAIL_CONFIG.split(':');
   if (!MAIL_CONFIG) throw new Error('Set NB_BUILD_NUMBER_APP_MAIL_CONFIG variable!');
@@ -23,19 +25,19 @@
   }
 
   connection.once('ready', function() {
-    openInbox((err, box) => {});
+    openInbox((err, box) => { });
   });
 
   connection.on('error', function(err) {
-    console.error(err);
+    log.error(err);
   });
 
   connection.on('end', function() {
-    console.log('Connection closed');
+    log.info('Connection closed');
   });
 
   connection.on('mail', function(newMessageCount) {
-    console.log(`${newMessageCount} new messages`);
+    log.info(`${newMessageCount} new messages`);
 
     openInbox((err, box) => {
       if (err) throw err;
@@ -54,7 +56,7 @@
           stream.on('data', chunk => body += chunk.toString('utf8'));
           stream.on('end', () => {
             let entry = mailHeaderToAppEntry(body);
-            controller.emit('message', entry);
+            controller.emit('update', null, entry);
           });
         });
       });
@@ -66,7 +68,7 @@
 
   function mailHeaderToAppEntry(input) {
     let header = Imap.parseHeader(input);
-    console.log(`[connection.on:mail][fetch.on:message][message.on:body] ${inspect(header)}`);
+    log.info(`[message.on:body] ${inspect(header)}`);
 
     const subject = header.subject[0].trim();
     const regex = /(.*)(\sver.\s)(.*)/; //TODO
@@ -74,7 +76,7 @@
     const ver = subject.replace(regex, '$3').replace('FW: ', '');
 
     if (!app || !ver) {
-      console.info(`${app}:${ver} is not a valid application info`);
+      log.info(`${app}:${ver} is not a valid application info`);
       return;
     }
 

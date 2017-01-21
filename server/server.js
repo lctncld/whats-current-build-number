@@ -5,13 +5,17 @@
   const fs = require('fs');
   const path = require('path');
   const WebSocketServer = require('ws').Server;
-  const mail = require('./mail');
+  const versionSource = require('./emailVersionSource');
   const Versions = require('./versions');
 
   const PORT = process.env.PORT || 4000;
   const STATIC_FILE_DIR = __dirname + '/../static';
 
+  const log = require('bunyan').createLogger({ name: 'Server' });
   const server = http.createServer().listen(PORT);
+
+  let versions = new Versions();
+
   server.on('request', function(request, response) {
     let requestPath = request.url;
     if (requestPath === '/version' && request.method === 'GET') {
@@ -23,29 +27,28 @@
       const fsPath = STATIC_FILE_DIR + path.normalize(requestPath);
       const fsStream = fs.createReadStream(fsPath);
       fsStream.on('error', e => {
-        console.warn(e);
+        log.warn(e);
         response.writeHead(404);
-        response.end()
+        response.end();
       });
       fsStream.pipe(response);
     }
   });
 
-  let wss = new WebSocketServer({server: server});
+  let wss = new WebSocketServer({ server: server });
   wss.on('connection', ws => {
     setInterval(_ => ws.send('ping', handleWsSendError), 60 * 1000);
-    mail.on('message', msg => ws.send('update', handleWsSendError));
+    versionSource.on('update', (err, data) => ws.send('update', handleWsSendError));
   });
 
   function handleWsSendError(err) {
-    console.warn('ws send error', err);
+    log.warn('ws send error', err);
   }
 
-  let versions = new Versions();
-
-  mail.on('message', msg => {
-    console.log('Message', msg);
-    versions.add(msg);
+  versionSource.on('update', (err, data) => {
+    if (err) return;
+    log.info('Message', data);
+    versions.add(data);
   });
 
 })();

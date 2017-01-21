@@ -4,17 +4,22 @@
   "description": "???",
   "main": "server.js",
   "scripts": {
-    "dev": "node_modules/.bin/supervisor --watch server -- --inspect server/server.js",
+    "dev": "node_modules/.bin/supervisor --watch server -- --inspect server/server.js | node_modules/.bin/bunyan -l trace",
+    "debug": "node debug server/server.js",
     "start": "node server/server.js",
-    "postinstall": "cd static && bower install"
+    "postinstall": "cd static && bower install",
+    "test": "jasmine"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "supervisor": "^0.12.0"
+    "supervisor": "^0.12.0",
+    "eslint": "^3.12.2",
+    "jasmine": "^2.5.3"
   },
   "dependencies": {
     "bower": "^1.8.0",
+    "bunyan": "^1.8.5",
     "imap": "^0.8.19",
     "ws": "^1.1.1"
   }
