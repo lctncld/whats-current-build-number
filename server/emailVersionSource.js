@@ -55,8 +55,13 @@
           let body = '';
           stream.on('data', chunk => body += chunk.toString('utf8'));
           stream.on('end', () => {
-            let entry = mailHeaderToAppEntry(body);
-            controller.emit('update', null, entry);
+            try {
+              const entry = mailHeaderToAppEntry(body);
+              controller.emit('update', null, entry);
+            } catch (e) {
+              log.warn(e);
+              controller.emit('update', e);
+            }
           });
         });
       });
@@ -71,13 +76,12 @@
     log.info(`[message.on:body] ${inspect(header)}`);
 
     const subject = header.subject[0].trim();
-    const regex = /(.*)(\sver.\s)(.*)/; //TODO
+    const regex = /(.+)(\sver.\s)(.+)/; //TODO
     const app = subject.replace(regex, '$1').replace('FW: ', '');
     const ver = subject.replace(regex, '$3').replace('FW: ', '');
 
-    if (!app || !ver) {
-      log.info(`${app}:${ver} is not a valid application info`);
-      return;
+    if (!app || !ver || app === ver) {
+      throw new Error(`${app}:${ver} is not a valid application info`);
     }
 
     return {

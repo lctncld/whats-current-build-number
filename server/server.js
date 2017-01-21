@@ -47,7 +47,7 @@
 
   versionSource.on('update', (err, data) => {
     if (err) return;
-    log.info('Message', data);
+    log.info('Update', data);
     versions.add(data);
   });
 
