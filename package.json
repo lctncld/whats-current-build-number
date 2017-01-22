@@ -7,7 +7,7 @@
     "dev": "node_modules/.bin/supervisor --watch server -- --inspect server/server.js | node_modules/.bin/bunyan -l trace",
     "debug": "node debug server/server.js",
     "start": "node server/server.js",
-    "postinstall": "cd static && bower install",
+    "postinstall": "cd static && bower install --allow-root",
     "test": "jasmine"
   },
   "author": "",

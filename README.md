@@ -1,14 +1,22 @@
 Version Numbers for the Chosen
 ----
 
-Don't forget to:
+App will be live at ```$PORT``` which defaults to ```4000```. For email access to work an env variable is required:
 ```
 export NB_BUILD_NUMBER_APP_MAIL_CONFIG="username:password:host:imap_port"
 ```
 
-How to run:
+How to
+---
 ```
 npm install
 npm start
 ```
-and it will be up at ```$PORT``` env variable or ```4000``` if it's not set.
+
+If you like Docker
+---
+Build an image from this repo and run it, let's call the image "nbn" and the container "build-number".
+```
+docker build -t nbn .
+docker run --name build-number -p 4000:4000 --env NB_BUILD_NUMBER_APP_MAIL_CONFIG=$NB_BUILD_NUMBER_APP_MAIL_CONFIG nbn
+```
